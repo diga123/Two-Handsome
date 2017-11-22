@@ -21,17 +21,16 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
 
     print(tau)
     print(tau_t)
-    for j in range(len(theta)):#生成优化目标的第一个terms
-        #print(len(tau_t[j]))
-        for i in tau_t[j]:
-                part1 += s_total[i]*Z[j]/theta[j] * (x[i][j]- theta[j])**2
-                #part1 += s[i][w]*V[j]/theta[j] * (1.0/s[i][w] * sum([a[w][n][j] * v1[i][w][n] for n in range(len(N[w]))]) - theta[j])**2
-                print(part1)
-    print('start')
+    # for j in range(len(theta)):#生成优化目标的第一个terms
+    #     #print(len(tau_t[j]))
+    #     for i in tau_t[j]:
+    #             part1 += s_total[i]*Z[j]/theta[j] * (x[i][j]- theta[j])**2
+
     for j in range(len(theta)):#生成目标的第二个term
         part2 += p[j] * u[j]
         #sprint(part2)
-    print('start')
+    #print('start')
+    print(part2)
     obj = part1 / 2 + part2#生成目标函数
 
     const = []
@@ -40,16 +39,15 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
         con = 0
         for i in tau_t[j]:
             con += x[i][j] * s_total[i]
-                    #print(con)
-                    #count += 1
-                    #print(count)
-        #constr = sum(a[w][n][j] * l['v' + str(i) + str(w) + str(j)] for w, n, i in range(len(W)) and range(len(N[w])) and tau_t[j])
+        print(con)
         const.append(con + u[j] >= d[j])
-    print('start')
-    for j in range(len(theta)):#生成限制2
+    #print('start')
+    for i in range(len(s)):#生成限制2
         con = 0
-        for i in tau_t[j]:
-            con += x[i][j]
+        for j in range(len(tau)):
+            if j in tau[i]:
+                con += x[i][j]
+        print(con)
         const.append(con <= 1)
 
     for i in range(len(tau)):#生成限制3
@@ -68,7 +66,7 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
     for j in range(len(theta)):#变量非负限制
         const.append(u[j] >= 0)
 
-
+    print(const)
     problem = Problem(Minimize(obj), const)
     result = problem.solve()
     print('problem: ', problem.status, ' result = ', result)
