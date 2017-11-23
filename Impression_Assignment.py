@@ -2,7 +2,7 @@ from cvxpy import *
 from scipy.optimize import *
 import numpy
 
-def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_t):#参数为分配问题的参数，分别对应于s，Z，theta，a, b, p, r, s^, 二分图的邻接矩阵, N，, 用户的类别
+def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_t, L, s_user):#参数为分配问题的参数，分别对应于s，Z，theta，a, b, p, r, s^, 二分图的邻接矩阵, N，, 用户的类别
     x = []
     u = []
     for i in range(len(s)):
@@ -53,14 +53,13 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
     for i in range(len(tau)):#生成限制3
         for j in range(len(d)):
             if j in tau[i]:
-                const.append(s_total[i]*x[i][j] <= f[j]*s_total_user[i])
+                const.append(s_total[i]*x[i][j] <= sum([L[v]*(int(s_user[i][v]+0.5)) for v in range(len(L)) if L[v]<=f[j]])+sum([f[j]*(int(s_user[i][v]+0.5)) for v in range(len(L)) if L[v]>f[j]]))
 
     for i in range(len(s)):
         x.append([])
         for j in range(len(d)):
             if j in tau[i]:
                 const.append(x[i][j] >= 0)
-                const.append(x[i][j] <= 1)
             else:
                 x[i].append(None)
     for j in range(len(theta)):#变量非负限制
@@ -82,36 +81,8 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
   #           beta[i].append(const[len(theta)+i*len(N)+w].dual_value)
   #         #  print(const[len(theta)+i*len(N)+w].dual_value)
   #
-  #   for i in range(len(tau)):#得到原始变量v
-  #       for w in range(len(W)):
-  #           for n in range(len(N[w])):
-  #               v[i][w][n] = v[i][w][n].value
-
-    count = 0
-
-    #for w in range(len(W)):
-       # for n in range(len(N[w])):
-            #sum1 = 0
-           # for i in range(len(tau)):
-               # sum1 += v[i][w][n]
-            #print(sum1)
-           # if sum1 > 0:
-           #     count += 1
-
-    #for j in range(len(theta)):#生成限制1
-        #ob = 0
-        #for i in tau_t[j]:
-           # for w in range(len(W)):
-                #for n in range(len(N[w])):
-                  #  if a[w][n][j] != 0:
-                     #   ob += a[w][n][j] * v[i][w][n]
-       # print(ob + u[j].value, d[j], ob > d[j])
-   # for j in range(len(theta)):
-       # print(u[j].value)
-#
-    #for i in range(len(tau)):#生成限制2
-       # for w in range(len(W)):
-           # ob = sum([v[i][w][n] for n in range(len(N[w]))])
-         #   if (ob > s_user[i][w]):
-              #  print(ob, s_user[i][w], ob <= s_user[i][w])
-    return 0
+    for i in range(len(tau)):#得到原始变量v
+        for j in range(len(d)):
+            if j in tau[i]:
+                x[i][j] = x[i][j].value
+    return x
