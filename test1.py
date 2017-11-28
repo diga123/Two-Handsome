@@ -22,16 +22,16 @@ s_sum = 0
 random.seed()
 global pattern_pool
 pattern_pool = {}
-for v in range(10):
+for v in range(5):
     V.append('length = ' + str(v + 1))
     L.append(v + 1)
-for i in range(500):  # 生成7个槽，随机生成每个槽曝光数
+for i in range(7):  # 生成7个槽，随机生成每个槽曝光数
     s.append([])
     s_user.append([])
     s_total.append(0)
     s_total_user.append(0)
-    for v in range(10):# 每个槽内曝光分为5类
-        rand = random.uniform(1, 7)
+    for v in range(5):# 每个槽内曝光分为5类
+        rand = random.uniform(2, 8)
         s[i].append(int((v + 1) * rand))
         s_total[i] += int((v + 1) * rand)
         s_sum += s[i][v]
@@ -42,23 +42,23 @@ print(s)
 print(s_user)
 print(s_total_user)
 print(s_total)
-for j in range(100):
-    rand = int(random.uniform(1000,1150))
+for j in range(5):
+    rand = int(random.uniform(95,105))
     d.append(rand)  # 生成5个订单，随机生成每个订单的需求量
     d_sum += rand
 print(d)
 print('d_sum = ', d_sum)
-for i in range(500):  # 随机生成二分图的邻接矩阵
+for i in range(7):  # 随机生成二分图的邻接矩阵
     tau.append([])
 
-for j in range(100):
+for j in range(5):
     tau_t.append([])
 
-for j in range(100):
-    temp = random.randint(20,300)
+for j in range(5):
+    temp = random.randint(2,6)
     count = 0
     while count < temp:
-        rand = random.randint(0, 499)
+        rand = random.randint(0, 6)
         #print(tau[rand].count(j))
         if tau[rand].count(j) == 0:
             tau[rand].append(j)
@@ -69,24 +69,26 @@ print('tau =' + str(len(tau)))
 #print('tau_t = ' + str(tau_t))
 
 # 生成邻接矩阵的转置矩阵以获取tau_j
-for j in range(100):
+for j in range(5):
     sum = 0
     for i in range(len(tau_t[j])):
-        for w in range(10):
+        for w in range(5):
             sum += s[i][w]
     temp = d[j] / sum
     theta.append(temp)
-    Z.append(1)
+    Z.append(0)
 
 
-for j in range(100):
-    f.append(2)
-    p.append(100)
+for j in range(5):
+    f.append(3)
+    p.append(10000)
 print('Column Generation')
 x  = impression_assignment(s, s_total_user, s_total, Z,f, theta, p, d, tau, tau_t, L, s_user)
 t_start = datetime.datetime.now()
 for i in range(len(s)):#得到模式池
-    #print(i)
+    print(i)
+    for j in range(len(tau[i])):
+        print(s_total[i]*x[i][tau[i][j]])
     pattern_pool[i] = {}
     t = datetime.datetime.now()
     y = pattern_generation(s_total[i], x[i], f, V, s_user[i], L, tau[i])

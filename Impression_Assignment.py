@@ -13,14 +13,14 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
             else:
                 x[i].append(None)
 
-    print(x)
+    #print(x)
     for j in range(len(theta)):
        u.append(Variable(1,1,'u' + str(j)))
     part1 = 0
     part2 = 0
 
-    print(tau)
-    print(tau_t)
+    #print(tau)
+    #print(tau_t)
     # for j in range(len(theta)):#生成优化目标的第一个terms
     #     #print(len(tau_t[j]))
     #     for i in tau_t[j]:
@@ -30,7 +30,7 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
         part2 += p[j] * u[j]
         #sprint(part2)
     #print('start')
-    print(part2)
+    #print(part2)
     obj = part1 / 2 + part2#生成目标函数
 
     const = []
@@ -39,7 +39,7 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
         con = 0
         for i in tau_t[j]:
             con += x[i][j] * s_total[i]
-        print(con)
+        #print(con)
         const.append(con + u[j] >= d[j])
     #print('start')
     for i in range(len(s)):#生成限制2
@@ -47,14 +47,15 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
         for j in range(len(tau)):
             if j in tau[i]:
                 con += x[i][j]
-        print(con)
+                #print(i,j)
+        #print(con)
         const.append(con <= 1)
 
     for i in range(len(tau)):#生成限制3
         for j in range(len(d)):
             if j in tau[i]:
                 const.append(s_total[i]*x[i][j] <= sum([L[v]*(int(s_user[i][v]+0.5)) for v in range(len(L)) if L[v]<=f[j]])+sum([f[j]*(int(s_user[i][v]+0.5)) for v in range(len(L)) if L[v]>f[j]]))
-
+                #print(sum([L[v]*(int(s_user[i][v]+0.5)) for v in range(len(L)) if L[v]<=f[j]])+sum([f[j]*(int(s_user[i][v]+0.5)) for v in range(len(L)) if L[v]>f[j]]))
     for i in range(len(s)):
         x.append([])
         for j in range(len(d)):
@@ -65,7 +66,7 @@ def impression_assignment(s, s_total_user, s_total, Z, f, theta, p, d, tau, tau_
     for j in range(len(theta)):#变量非负限制
         const.append(u[j] >= 0)
 
-    print(const)
+    #print(const)
     problem = Problem(Minimize(obj), const)
     result = problem.solve()
     print('problem: ', problem.status, ' result = ', result)
